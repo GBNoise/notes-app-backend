@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
-//        http.httpBasic().disable()
-//        http.formLogin().disable()
+        http.csrf().disable().cors().disable()
     }
 }
