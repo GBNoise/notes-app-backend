@@ -1,12 +1,12 @@
 import { Prisma, User } from '@prisma/client';
-import { AppError, API_PATH } from 'src/utils';
+import { AppResponse, API_PATH } from 'src/utils';
 
 export const APP_USER_CONTROLLER_ROUTE: string = API_PATH + '/users';
 
 export interface AppUserServiceInterface {
-  createUser: (user: Prisma.UserCreateInput) => Promise<User | AppError>;
-  deleteUser: (user: Prisma.UserDeleteArgs) => void;
+  createUser: (user: Prisma.UserCreateInput) => Promise<User | AppResponse>;
+  deleteUser: (id: string) => void;
   updateUser: (user: Prisma.UserUpdateInput) => void;
-  getUser: (user: Prisma.UserFindFirstArgs) => Promise<User | AppError>;
-  getAllUsers: () => Promise<Array<User> | AppError>;
+  getUser: (id?: string, username?: string) => Promise<User | AppResponse>;
+  getAllUsers: () => Promise<Array<User> | AppResponse>;
 }
