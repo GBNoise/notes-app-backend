@@ -12,6 +12,7 @@ export class AppUserController {
   async getAllUsers(@Res() res: Response) {
     try {
       const response = await this.appUserService.getAllUsers();
+      console.log(typeof response);
       return res.status(200).send(response);
     } catch (e) {
       return res.status(500).send(e);
