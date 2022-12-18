@@ -6,6 +6,6 @@ import { AppUserService } from './appuser.service';
   imports: [],
   controllers: [AppUserController],
   providers: [AppUserService],
-  exports: [],
+  exports: [AppUserService],
 })
 export class AppUserModule {}

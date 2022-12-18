@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { AppUserServiceInterface } from './appuser.utils';
 import { prisma } from 'prisma/prisma.utils';
-import { AppResponse } from 'src/utils';
+import { AppResponse, generateHash } from 'src/utils';
 import { Prisma, User } from '@prisma/client';
 
 @Injectable()
 export class AppUserService implements AppUserServiceInterface {
   async createUser(user: Prisma.UserCreateInput): Promise<User | AppResponse> {
     try {
+      const hash = await generateHash(user.password);
+      user.password = hash;
+
       const createdUser = await prisma.user.create({ data: user });
       return Promise.resolve(createdUser);
     } catch (e) {
@@ -70,6 +73,7 @@ export class AppUserService implements AppUserServiceInterface {
 
   async deleteUser(id: string): Promise<User | AppResponse> {
     try {
+      console.log({ id });
       const deletedUser = await prisma.user.delete({ where: { id } });
       return Promise.resolve(deletedUser);
     } catch (e) {
