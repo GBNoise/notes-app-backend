@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-
+import * as CryptoJS from 'crypto-js';
 export const API_PATH = '/api/v1';
 
 export interface AppResponse {
@@ -25,6 +25,31 @@ export const compareHash = async (password: string, hash: string) => {
     return Promise.resolve(isCorrect);
   } catch (e) {
     return Promise.reject(e.message);
+  }
+};
+
+export const encryptPassword = async (password: string) => {
+  try {
+    const encryptedPassword = CryptoJS.AES.encrypt(
+      password,
+      process.env.PASSWORD_ENCRYPTION_SECRET,
+    );
+    return Promise.resolve(encryptedPassword);
+  } catch (e) {
+    return Promise.reject(e.message);
+  }
+};
+
+export const decryptPassword = async (encryptedPassword: string) => {
+  try {
+    const decryptedPassword = CryptoJS.AES.decrypt(
+      encryptedPassword,
+      process.env.PASSWORD_ENCRYPTION_SECRET,
+    ).toString(CryptoJS.enc.Utf8);
+
+    return Promise.resolve(decryptedPassword);
+  } catch (e) {
+    Promise.reject(e.message);
   }
 };
 
