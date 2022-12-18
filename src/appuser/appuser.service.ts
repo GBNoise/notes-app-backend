@@ -76,12 +76,16 @@ export class AppUserService implements AppUserServiceInterface {
     }
   }
 
-  async deleteAllUsers(): Promise<boolean> {
+  async deleteAllUsers(): Promise<boolean | AppResponse> {
     try {
       const deletedUsers = await prisma.user.deleteMany();
       if (deletedUsers) return Promise.resolve(true);
     } catch (e) {
-      return Promise.resolve(false);
+      const error: AppResponse = {
+        message: 'An error ocurred while trying to delete all users',
+        technicalMessage: e.message,
+      };
+      return Promise.resolve(error);
     }
   }
 
