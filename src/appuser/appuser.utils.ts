@@ -1,4 +1,4 @@
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, Role } from '@prisma/client';
 import { AppResponse, API_PATH } from '../utils';
 
 export const APP_USER_CONTROLLER_ROUTE: string = API_PATH + '/users';
@@ -9,5 +9,25 @@ export interface AppUserServiceInterface {
   deleteAllUsers: () => Promise<boolean | AppResponse>;
   updateUser: (user: Prisma.UserUpdateInput) => Promise<User | AppResponse>;
   getUser: (id?: string, username?: string) => Promise<User | AppResponse>;
-  getAllUsers: () => Promise<Array<User> | AppResponse>;
+  getAllUsers: () => Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse>;
+}
+
+
+export interface UserWithRoles {
+  id: string,
+  username: string;
+  email: string;
+  creationDate: Date,
+  updateDate: Date,
+  UserRoles: {
+    role: { id: string, name: string }
+  }
+}
+
+export interface UserWithoutPassword {
+  id: string,
+  username: string,
+  email: string,
+  creationDate: Date;
+  updateDate: Date;
 }

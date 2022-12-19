@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AppUserServiceInterface } from './appuser.utils';
+import { AppUserServiceInterface, UserWithRoles, UserWithoutPassword } from './appuser.utils';
 import { prisma } from '../../prisma/prisma.utils';
 import { AppResponse, decryptPassword, generateHash } from '../utils';
 import { Prisma, User } from '@prisma/client';
@@ -43,9 +43,24 @@ export class AppUserService implements AppUserServiceInterface {
     }
   }
 
-  async getAllUsers(): Promise<Array<User> | AppResponse> {
+  async getAllUsers(): Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse> {
     try {
-      const users = await prisma.user.findMany();
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          creationDate: true,
+          updateDate: true,
+          UserRoles: {
+            select: {
+              role: {
+                select: { id: true, name: true }
+              }
+            }
+          }
+        }
+      });
       return Promise.resolve(users);
     } catch (e) {
       const error: AppResponse = {
