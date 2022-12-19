@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { AppUserService } from 'src/appuser/appuser.service';
-import { compareHash } from 'src/utils';
+import { AppUserService } from '../appuser/appuser.service';
+import { compareHash } from '../utils';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { Roles } from './auth.utils';
@@ -30,8 +30,14 @@ export class AuthService {
       updateDate: user.updateDate,
       roles: [Roles.ROLE_USER],
     };
+
+    const refreshPayload = {
+      id: 'random id that needs to be changed to a significant id in the database',
+    };
+
     return {
       access_token: this.jwtService.sign(payload),
+      refresh_token: this.jwtService.sign(refreshPayload),
     };
   }
 }
