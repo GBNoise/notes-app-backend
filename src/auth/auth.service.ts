@@ -40,4 +40,14 @@ export class AuthService {
       refresh_token: this.jwtService.sign(refreshPayload, { expiresIn: '30d' }),
     };
   }
+
+
+  generateAccessToken(payload: any) {
+    return { access_token: this.jwtService.sign(payload) }
+  }
+
+  generateRefreshToken(payload: any) {
+    return { refresh_token: this.jwtService.sign(payload) }
+  }
+
 }
