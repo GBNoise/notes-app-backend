@@ -6,13 +6,12 @@ import { APP_USER_CONTROLLER_ROUTE } from './appuser.utils';
 
 @Controller(APP_USER_CONTROLLER_ROUTE)
 export class AppUserController {
-  constructor(private readonly appUserService: AppUserService) {}
+  constructor(private readonly appUserService: AppUserService) { }
 
   @Get()
-  async getAllUsers(@Res() res: Response) {
+  async getAllUsers(@Res() res: Response, @Query('showRoles') showRoles: boolean, @Query('page') page: number) {
     try {
-      const response = await this.appUserService.getAllUsers();
-      console.log(typeof response);
+      const response = await this.appUserService.getAllUsers({ showRoles, page });
       return res.status(200).send(response);
     } catch (e) {
       return res.status(500).send(e);

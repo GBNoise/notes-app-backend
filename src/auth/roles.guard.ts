@@ -5,10 +5,10 @@ import { Roles } from './auth.utils';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<Roles[]>('roles', [
+    const requiredRoles = this.reflector.getAllAndOverride<Roles[]>('UserRoles', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -17,6 +17,6 @@ export class RolesGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
 
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    return requiredRoles.some((role) => user.UserRoles?.includes(role));
   }
 }

@@ -4,17 +4,19 @@ import { compareHash } from '../utils';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { Roles } from './auth.utils';
+import { UserWithRoles, UserWithRolesAndPassword } from 'src/appuser/appuser.utils';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly appUserService: AppUserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(username: string, pass: string): Promise<any> {
-    const user = (await this.appUserService.getUser(undefined, username)) as User;
+    const user = (await this.appUserService.getUser(undefined, username, { showRoles: true, includeHashedPassword: true })) as UserWithRolesAndPassword;
 
+    console.log({ user })
     const isPasswordCorrect = await compareHash(pass, user.password);
     if (!user || !isPasswordCorrect) return null;
     const { password, ...result } = user;
@@ -28,7 +30,7 @@ export class AuthService {
       sub: user.id,
       creationDate: user.creationDate,
       updateDate: user.updateDate,
-      roles: [Roles.ROLE_USER],
+      UserRoles: user.UserRoles,
     };
 
     const refreshPayload = {
