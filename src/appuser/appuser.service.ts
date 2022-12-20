@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AppUserServiceInterface } from './appuser.utils';
+import { AppUserServiceInterface, GetUserOptions, UserWithRoles, UserWithRolesAndPassword, UserWithoutPassword, filterGetUserOptions } from './appuser.utils';
 import { prisma } from '../../prisma/prisma.utils';
 import { AppResponse, decryptPassword, generateHash } from '../utils';
 import { Prisma, User } from '@prisma/client';
@@ -23,13 +23,17 @@ export class AppUserService implements AppUserServiceInterface {
     }
   }
 
-  async getUser(id?: string, username?: string): Promise<User | AppResponse> {
+  async getUser(id?: string, username?: string, options?: GetUserOptions):
+    Promise<UserWithoutPassword | UserWithRoles | UserWithRolesAndPassword | AppResponse> {
     try {
       if (!username && !id)
         throw new Error('At least one property id or username has to be specified');
 
+      let select = {}
+      if (options) select = filterGetUserOptions(options);
+
       const where = id ? { id } : { username };
-      const userFound = await prisma.user.findFirst({ where });
+      const userFound = await prisma.user.findFirst({ where, select }) as UserWithoutPassword | UserWithRoles;
 
       if (!userFound) throw new Error(`User with id: ${id} or username:${username} was not found`);
 
@@ -43,9 +47,13 @@ export class AppUserService implements AppUserServiceInterface {
     }
   }
 
-  async getAllUsers(): Promise<Array<User> | AppResponse> {
+  async getAllUsers(options: GetUserOptions): Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse> {
     try {
-      const users = await prisma.user.findMany();
+      const select = filterGetUserOptions(options);
+      const users = await prisma.user.findMany({
+        select
+      }) as UserWithRoles[] | UserWithoutPassword[]
+
       return Promise.resolve(users);
     } catch (e) {
       const error: AppResponse = {
@@ -76,12 +84,16 @@ export class AppUserService implements AppUserServiceInterface {
     }
   }
 
-  async deleteAllUsers(): Promise<boolean> {
+  async deleteAllUsers(): Promise<boolean | AppResponse> {
     try {
       const deletedUsers = await prisma.user.deleteMany();
       if (deletedUsers) return Promise.resolve(true);
     } catch (e) {
-      return Promise.resolve(false);
+      const error: AppResponse = {
+        message: 'An error ocurred while trying to delete all users',
+        technicalMessage: e.message,
+      };
+      return Promise.resolve(error);
     }
   }
 
