@@ -18,6 +18,7 @@ export class AppUserService implements AppUserServiceInterface {
       const error: AppResponse = {
         message: 'An error ocurred while trying to create a user',
         technicalMessage: e.message,
+        status: 500
       };
       return Promise.reject(error);
     }
@@ -42,6 +43,7 @@ export class AppUserService implements AppUserServiceInterface {
       const error: AppResponse = {
         message: 'An error ocurred while trying to find a unique user',
         technicalMessage: e.message,
+        status: 500
       };
       return Promise.reject(error);
     }
@@ -60,6 +62,7 @@ export class AppUserService implements AppUserServiceInterface {
     } catch (e) {
       const error: AppResponse = {
         message: e.message,
+        status: 500
       };
       return Promise.reject(error);
     }
@@ -81,6 +84,7 @@ export class AppUserService implements AppUserServiceInterface {
       const error: AppResponse = {
         message: 'An error ocurred while trying to update the user',
         technicalMessage: e.message,
+        status: 500
       };
       return Promise.reject(error);
     }
@@ -94,6 +98,7 @@ export class AppUserService implements AppUserServiceInterface {
       const error: AppResponse = {
         message: 'An error ocurred while trying to delete all users',
         technicalMessage: e.message,
+        status: 500
       };
       return Promise.resolve(error);
     }
@@ -107,6 +112,7 @@ export class AppUserService implements AppUserServiceInterface {
       const error: AppResponse = {
         message: `An error ocurred while trying to delete the user with id: ${id}`,
         technicalMessage: e.message,
+        status: 500
       };
       return Promise.reject(error);
     }

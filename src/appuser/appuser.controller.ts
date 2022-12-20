@@ -17,10 +17,12 @@ export class AppUserController {
   @Get()
   async getAllUsers(@Request() req: any, @Res() res: Response, @Query('showRoles') showRoles: boolean, @Query('page') page: number) {
     try {
+      if (!validateAdmin(req.user)) throw new ForbiddenException();
+
       const response = await this.appUserService.getAllUsers({ showRoles, page });
       return res.status(200).send(response);
     } catch (e) {
-      return res.status(500).send(e);
+      return res.status(e.status).send(e);
     }
   }
 
@@ -44,7 +46,7 @@ export class AppUserController {
       const response = await this.appUserService.createUser(user);
       return res.status(HttpStatus.CREATED).send(response);
     } catch (e) {
-      return res.status(500).send(e);
+      return res.status(e.status).send(e);
     }
   }
 
@@ -61,7 +63,7 @@ export class AppUserController {
       const response = await this.appUserService.updateUser(user);
       return res.status(HttpStatus.OK).send(response);
     } catch (e) {
-      return res.status(500).send(e);
+      return res.status(e.status).send(e);
     }
   }
 
@@ -77,7 +79,7 @@ export class AppUserController {
       const response = await this.appUserService.deleteUser(id);
       return res.status(HttpStatus.OK).send(response);
     } catch (e) {
-      return res.status(500).send(e);
+      return res.status(e.status).send(e);
     }
   }
 }
