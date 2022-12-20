@@ -53,7 +53,3 @@ export const decryptPassword = async (encryptedPassword: string) => {
   }
 };
 
-export type LoginUser = {
-  username: string;
-  password: string;
-};
