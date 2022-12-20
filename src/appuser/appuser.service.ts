@@ -100,7 +100,7 @@ export class AppUserService implements AppUserServiceInterface {
         technicalMessage: e.message,
         status: 500
       };
-      return Promise.resolve(error);
+      return Promise.reject(error);
     }
   }
 
