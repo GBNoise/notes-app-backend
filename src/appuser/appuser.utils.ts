@@ -45,6 +45,21 @@ export const filterGetUserOptions = (options: GetUserOptions) => {
   return select;
 }
 
+
+export const validateAdmin = (reqUser: any) => {
+  return reqUser.UserRoles.some(({ role }) => role.name === "ADMIN");
+}
+
+export const validateSameUser = (reqUser: any, id: string, username: string) => {
+  const { id: loggedUserId, username: loggedUserUsername } = reqUser;
+
+
+  if ((id && loggedUserId !== id) || (username && loggedUserUsername !== username))
+    return false
+
+  return true
+}
+
 export interface GetUserOptions {
   showRoles?: boolean | string;
   page?: number;
