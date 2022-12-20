@@ -47,9 +47,11 @@ export class AppUserService implements AppUserServiceInterface {
     }
   }
 
-  async getAllUsers(options: GetUserOptions): Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse> {
+  async getAllUsers(options?: GetUserOptions): Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse> {
     try {
-      const select = filterGetUserOptions(options);
+      let select = {};
+      if (options) select = filterGetUserOptions(options);
+
       const users = await prisma.user.findMany({
         select
       }) as UserWithRoles[] | UserWithoutPassword[]

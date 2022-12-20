@@ -19,7 +19,6 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { HasRoles } from './auth/roles.decorator';
 import { RolesGuard } from './auth/roles.guard';
-import { LoginUser } from './utils';
 
 @Controller()
 export class AppController {
