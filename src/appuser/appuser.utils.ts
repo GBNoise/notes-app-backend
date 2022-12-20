@@ -8,8 +8,8 @@ export interface AppUserServiceInterface {
   deleteUser: (id: string) => Promise<User | AppResponse>;
   deleteAllUsers: () => Promise<boolean | AppResponse>;
   updateUser: (user: Prisma.UserUpdateInput) => Promise<User | AppResponse>;
-  getUser: (id?: string, username?: string) => Promise<UserWithoutPassword | UserWithRoles | AppResponse>;
-  getAllUsers: (options: GetUserOptions) => Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse>;
+  getUser: (id?: string, username?: string, options? : GetUserOptions) => Promise<UserWithoutPassword | UserWithRoles | AppResponse>;
+  getAllUsers: (options?: GetUserOptions) => Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse>;
 }
 
 
