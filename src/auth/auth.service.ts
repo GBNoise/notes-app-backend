@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AppUserService } from '../appuser/appuser.service';
 import { compareHash } from '../utils';
-import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
-import { Roles } from './auth.utils';
-import { UserWithRoles, UserWithRolesAndPassword } from 'src/appuser/appuser.utils';
+import { UserWithRolesAndPassword } from 'src/appuser/appuser.utils';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +37,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(refreshPayload),
+      refresh_token: this.jwtService.sign(refreshPayload, { expiresIn: '30d' }),
     };
   }
 }
