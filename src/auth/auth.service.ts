@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AppUserService } from '../appuser/appuser.service';
-import { compareHash } from '../utils';
+import { AppResponse, compareHash } from '../utils';
 import { JwtService } from '@nestjs/jwt';
 import { UserWithRolesAndPassword } from 'src/appuser/appuser.utils';
-
+import { AccessToken, ACCESS_TOKEN_DURATION, RefreshToken, REFRESH_TOKEN_DURATION } from './auth.utils';
+import { prisma } from 'prisma/prisma.utils';
+import { AuthToken } from '@prisma/client';
 @Injectable()
 export class AuthService {
   constructor(
@@ -14,7 +16,6 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<any> {
     const user = (await this.appUserService.getUser(undefined, username, { showRoles: true, includeHashedPassword: true })) as UserWithRolesAndPassword;
 
-    console.log({ user })
     const isPasswordCorrect = await compareHash(pass, user.password);
     if (!user || !isPasswordCorrect) return null;
     const { password, ...result } = user;
@@ -35,19 +36,94 @@ export class AuthService {
       id: 'random id that needs to be changed to a significant id in the database',
     };
 
+    const access_token = await this.generateAccessToken(payload)
+    const refresh_token = await this.generateRefreshToken(refreshPayload)
+
     return {
-      access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(refreshPayload, { expiresIn: '30d' }),
+      access_token: access_token['access_token'],
+      refresh_token: refresh_token["refresh_token"],
     };
   }
 
 
-  generateAccessToken(payload: any) {
-    return { access_token: this.jwtService.sign(payload) }
+  async generateAccessToken(payload: AccessToken): Promise<{ access_token: string }> {
+    try {
+      const access_token = this.jwtService.sign(payload, { expiresIn: ACCESS_TOKEN_DURATION })
+      await this.saveAuthToken(access_token);
+      return Promise.resolve({ access_token })
+    } catch (e) {
+      throw new InternalServerErrorException()
+    }
   }
 
-  generateRefreshToken(payload: any) {
-    return { refresh_token: this.jwtService.sign(payload) }
+  async generateRefreshToken(payload: RefreshToken): Promise<{ refresh_token: string }> {
+    try {
+      const refresh_token = this.jwtService.sign(payload, { expiresIn: REFRESH_TOKEN_DURATION })
+      await this.saveAuthToken(refresh_token);
+      return Promise.resolve({ refresh_token })
+    }
+    catch (e) {
+      throw new InternalServerErrorException()
+    }
+  }
+
+
+  async saveAuthToken(token: string): Promise<AuthToken> {
+    try {
+      const savedToken = await prisma.authToken.create({
+        data: { id: token }
+      })
+      return savedToken;
+    } catch (e) {
+      throw new InternalServerErrorException()
+    }
+  }
+
+  async validateDBAuthToken(token: string): Promise<AuthToken> {
+    try {
+      const savedToken = await prisma.authToken.findFirst({
+        where: { id: token }
+      })
+      if (!savedToken) throw new ForbiddenException()
+
+      return savedToken;
+    } catch (e) {
+      throw new ForbiddenException()
+    }
+  }
+
+  async validateRefreshToken(token: string, bearerToken: string) {
+    try {
+      // validate token expiration
+      this.jwtService.verify(token)
+
+      // decode the token
+      const decodedToken = this.jwtService.decode(token);
+
+      // validate existing token on the database
+      token = (await this.validateDBAuthToken(token)).id;
+
+      bearerToken = bearerToken.substring("Bearer ".length);
+      // access to the bearer token
+      const decodedBearerToken = this.jwtService.decode(bearerToken) as AccessToken;
+
+
+      // generate new access and refresh token
+      const access_token = this.generateAccessToken(decodedBearerToken);
+      const refresh_token = this.generateRefreshToken({} as RefreshToken);
+
+      const tokens = { ...access_token, ...refresh_token };
+
+      // return the tokens
+      return Promise.resolve(tokens);
+    } catch (e) {
+      const error: AppResponse = {
+        message: "An error ocurred while trying to generate new tokens",
+        technicalMessage: e.message,
+        status: HttpStatus.FORBIDDEN
+      }
+      return Promise.reject(error)
+    }
   }
 
 }
