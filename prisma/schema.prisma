@@ -31,3 +31,7 @@ model UserRoles {
   role   Role   @relation(fields: [roleId], references: [id])
   roleId String
 }
+
+model AuthToken {
+   id String @unique
+}
