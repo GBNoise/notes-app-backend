@@ -8,14 +8,14 @@ export interface AppUserServiceInterface {
   deleteUser: (id: string) => Promise<User | AppResponse>;
   deleteAllUsers: () => Promise<boolean | AppResponse>;
   updateUser: (user: Prisma.UserUpdateInput) => Promise<User | AppResponse>;
-  getUser: (id?: string, username?: string, options? : GetUserOptions) => Promise<UserWithoutPassword | UserWithRoles | AppResponse>;
+  getUser: (id?: string, username?: string, options?: GetUserOptions) => Promise<UserWithoutPassword | UserWithRoles | AppResponse>;
   getAllUsers: (options?: GetUserOptions) => Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse>;
 }
 
 
-export const filterGetUserOptions = (options: GetUserOptions) => {
-  const { showRoles, page, includeHashedPassword } = options;
-  if (!showRoles && !page && !includeHashedPassword) return;
+export const filterGetUserOptions = (options: GetUserOptions): { select: any, take: number, skip: number } => {
+  let { showRoles, page, includeHashedPassword, take } = options;
+  if (!showRoles && !includeHashedPassword) return;
 
   let select = {
     id: true,
@@ -41,8 +41,11 @@ export const filterGetUserOptions = (options: GetUserOptions) => {
     ...select, password: true
   }
 
+  page = page ? page <= 0 ? 1 : page : 1;
+  take = take || 10;
+  let skip = page ? (page * take) - take : 0;
 
-  return select;
+  return { select, take: Number(take), skip };
 }
 
 
@@ -63,6 +66,7 @@ export const validateSameUser = (reqUser: any, id: string, username: string) => 
 export interface GetUserOptions {
   showRoles?: boolean | string;
   page?: number;
+  take?: number;
   includeHashedPassword?: boolean | string
 }
 
