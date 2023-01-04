@@ -25,11 +25,11 @@ export class AppUserController {
   @HasRoles(Roles.ROLE_ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
-  async getAllUsers(@Request() req: any, @Res() res: Response, @Query('showRoles') showRoles: boolean, @Query('page') page: number) {
+  async getAllUsers(@Request() req: any, @Res() res: Response, @Query('showRoles') showRoles: boolean, @Query('page') page: number, @Query('take') take: number) {
     try {
       if (!validateAdmin(req.user)) throw new ForbiddenException();
 
-      const response = await this.appUserService.getAllUsers({ showRoles, page });
+      const response = await this.appUserService.getAllUsers({ showRoles, page, take });
       return res.status(200).send(response);
     } catch (e) {
       return res.status(e.status).send(e);
