@@ -52,14 +52,15 @@ export class AppUserService implements AppUserServiceInterface {
         throw new Error('At least one property id or username has to be specified');
 
       // this variable contains the filtering options that will be passed to prisma
-      let select = {}
+      let filteredOptions: any = {}
       // in case of having options we use the filterGetUserOptions to fill the select object
-      if (options) select = filterGetUserOptions(options);
+      if (options) filteredOptions = filterGetUserOptions(options);
+
 
       // where will be either the id or username depending on what was passed to the function
       const where = id ? { id } : { username };
       // retreive the user from the database using findFirst passing where and select  
-      const userFound = await prisma.user.findFirst({ where, select }) as UserWithoutPassword | UserWithRoles;
+      const userFound = await prisma.user.findFirst({ where, ...filteredOptions }) as UserWithoutPassword | UserWithRoles;
 
       // if no user was found throw an error
       if (!userFound) throw new Error(`User with id: ${id} or username:${username} was not found`);
@@ -85,13 +86,13 @@ export class AppUserService implements AppUserServiceInterface {
   async getAllUsers(options?: GetUserOptions): Promise<Array<UserWithRoles | UserWithoutPassword> | AppResponse> {
     try {
       // this variable contains the filtering options that will be passed to prisma
-      let select = {};
+      let filteredOptions = {} as any;
       // in case of having options we use the filterGetUserOptions to fill the select object
-      if (options) select = filterGetUserOptions(options);
+      if (options) filteredOptions = filterGetUserOptions(options);
 
       // retrieving the users from the database using findMany and passing select
       const users = await prisma.user.findMany({
-        select
+        ...filteredOptions
       }) as UserWithRoles[] | UserWithoutPassword[]
 
       // returning the users
