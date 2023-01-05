@@ -25,11 +25,14 @@ export class AppUserController {
   @HasRoles(Roles.ROLE_ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
-  async getAllUsers(@Request() req: any, @Res() res: Response, @Query('showRoles') showRoles: boolean, @Query('page') page: number, @Query('take') take: number) {
+  async getAllUsers(@Request() req: any, @Res() res: Response,
+    @Query('showRoles') showRoles: boolean,
+    @Query('page') page: number, @Query('take') take: number,
+    @Query('includeNotes') includeNotes: string) {
     try {
       if (!validateAdmin(req.user)) throw new ForbiddenException();
 
-      const response = await this.appUserService.getAllUsers({ showRoles, page, take });
+      const response = await this.appUserService.getAllUsers({ showRoles, page, take, includeNotes });
       return res.status(200).send(response);
     } catch (e) {
       return res.status(e.status).send(e);
@@ -51,11 +54,14 @@ export class AppUserController {
   @HasRoles(Roles.ROLE_USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('/user')
-  async getSingleUser(@Request() req: any, @Query('id') id: string, @Query('username') username: string, @Res() res: Response, @Query('showRoles') showRoles: string) {
+  async getSingleUser(@Request() req: any, @Query('id') id: string,
+    @Query('username') username: string, @Res() res: Response,
+    @Query('showRoles') showRoles: string,
+    @Query('includeNotes') includeNotes: string) {
     try {
       if (!validateSameUser(req.user, id, username)) throw new ForbiddenException()
 
-      const response = await this.appUserService.getUser(id, username, { showRoles });
+      const response = await this.appUserService.getUser(id, username, { showRoles, includeNotes });
       return res.status(HttpStatus.OK).send(response);
     } catch (e) {
       return res.status(e.status).send(e);

@@ -23,8 +23,8 @@ export interface AppUserServiceInterface {
  * @returns the filtered select object that can be used with prisma to get users from the database
  */
 export const filterGetUserOptions = (options: GetUserOptions): { select: any, take: number, skip: number } => {
-  let { showRoles, page, includeHashedPassword, take } = options;
-  if (!showRoles && !includeHashedPassword) return;
+  let { showRoles, page, includeHashedPassword, take, includeNotes } = options;
+  if (!showRoles && !includeHashedPassword && !includeNotes) return;
 
   let select = {
     id: true,
@@ -44,6 +44,11 @@ export const filterGetUserOptions = (options: GetUserOptions): { select: any, ta
         }
       }
     }
+  }
+
+  if (includeNotes === "true" || includeNotes === true) select = {
+    ...select,
+    notes: true
   }
 
   if (includeHashedPassword === "true" || includeHashedPassword === true) select = {
@@ -91,6 +96,7 @@ export interface GetUserOptions {
   page?: number;
   take?: number;
   includeHashedPassword?: boolean | string
+  includeNotes?: boolean | string;
 }
 
 
