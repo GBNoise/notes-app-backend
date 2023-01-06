@@ -10,12 +10,20 @@ export interface NotesServiceInterface {
     deleteUserNotes: (userID: string) => Promise<boolean | AppResponse>;
     updateNote: (note: Prisma.NoteUpdateInput) => Promise<Note | AppResponse>;
     getAllNotes: (options?: GetNoteOptions) => Promise<Note[] | AppResponse>;
-    getUserNotes: (options?: GetNoteOptions) => Promise<Note[] | AppResponse>;
-    getSingleNote: (options?: GetNoteOptions) => Promise<Note | AppResponse>;
+    getUserNotes: (userID: string) => Promise<Note[] | AppResponse>;
+    getSingleNote: (id:string) => Promise<Note | AppResponse>;
 }
 
 
 export interface GetNoteOptions {
     page?: number;
     take?: number;
+}
+
+export const filterGetNoteOptions = (options: GetNoteOptions) => {
+    let { page, take } = options;
+    page = page ? page <= 0 ? 1 : page : 1;
+    take = take || 10;
+    let skip = page ? (page * take) - take : 0;
+    return { take, skip };
 }
