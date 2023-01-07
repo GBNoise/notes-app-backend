@@ -8,6 +8,19 @@ export interface AppResponse {
   status?: number;
 }
 
+export interface GetOptions {
+  take?: number;
+  page?: number;
+}
+
+export const filterGetOptions = (options?: GetOptions) => {
+  let { page, take } = options;
+  page = page ? page <= 0 ? 1 : page : 1;
+  take = Number(take) || 10;
+  let skip = page ? (page * take) - take : 0;
+  return { take, skip };
+}
+
 export const generateHash = async (password: string) => {
   try {
     const saltRounds = 10;
