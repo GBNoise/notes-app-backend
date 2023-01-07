@@ -72,7 +72,7 @@ export class NotesController {
     @HasRoles(Roles.ROLE_ADMIN)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete()
-    async deleteAllUserNotes(@Res() res: Response) {
+    async deleteAllNotes(@Res() res: Response) {
         try {
             const response = await this.notesService.deleteAllNotes();
             return res.status(200).send(response);
@@ -80,4 +80,4 @@ export class NotesController {
             return res.status(e.status).send(e);
         }
     }
-}
+} 
