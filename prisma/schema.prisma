@@ -16,6 +16,8 @@ model User {
   creationDate DateTime    @default(now())
   updateDate   DateTime    @updatedAt
   UserRoles    UserRoles[]
+  notes        Note[]
+  events       Event[]
 }
 
 model Role {
@@ -30,4 +32,31 @@ model UserRoles {
   userId String
   role   Role   @relation(fields: [roleId], references: [id])
   roleId String
+}
+
+model Note {
+  id String @id @default(cuid())
+  title String
+  content String
+  creationDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  userId String
+  user User @relation(fields:[userId], references:[id])
+}
+
+model Event {
+  id String @id @default(cuid())
+  title String 
+  description String
+  from Int 
+  to Int
+  creationDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  userId String
+  user User @relation(fields:[userId], references: [id])
+}
+
+
+model AuthToken {
+   id String @unique
 }

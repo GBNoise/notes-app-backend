@@ -5,7 +5,20 @@ export const API_PATH = '/api/v1';
 export interface AppResponse {
   message: string;
   technicalMessage?: string;
-  statusCode?: number;
+  status?: number;
+}
+
+export interface GetOptions {
+  take?: number;
+  page?: number;
+}
+
+export const filterGetOptions = (options?: GetOptions) => {
+  let { page, take } = options;
+  page = page ? page <= 0 ? 1 : page : 1;
+  take = Number(take) || 10;
+  let skip = page ? (page * take) - take : 0;
+  return { take, skip };
 }
 
 export const generateHash = async (password: string) => {
