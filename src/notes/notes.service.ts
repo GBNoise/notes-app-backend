@@ -57,7 +57,7 @@ export class NotesService implements NotesServiceInterface {
                 technicalMessage: e.message,
                 status: 500
             }
-            return Promise.reject(e);
+            return Promise.reject(error);
         }
     };
 
@@ -177,6 +177,20 @@ export class NotesService implements NotesServiceInterface {
      * @param id the id of the note that will be searched in the db
      */
     async getSingleNote(id: string): Promise<Note | AppResponse> {
-        return new Promise(() => { })
+        try {
+            const note = await prisma.note.findFirst({
+                where: {
+                    id
+                }
+            })
+            return Promise.resolve(note);
+        } catch (e) {
+            const error: AppResponse = {
+                message: `An error ocurred while trying to retrieve the note with id: ${id}`,
+                technicalMessage: e.message,
+                status: 500
+            }
+            return Promise.reject(error);
+        }
     }
 }
