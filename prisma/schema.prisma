@@ -17,6 +17,7 @@ model User {
   updateDate   DateTime    @updatedAt
   UserRoles    UserRoles[]
   notes        Note[]
+  events       Event[]
 }
 
 model Role {
@@ -41,6 +42,18 @@ model Note {
   updateDate DateTime @updatedAt
   userId String
   user User @relation(fields:[userId], references:[id])
+}
+
+model Event {
+  id String @id @default(cuid())
+  title String 
+  description String
+  from Int 
+  to Int
+  creationDate DateTime @default(now())
+  updateDate DateTime @updatedAt
+  userId String
+  user User @relation(fields:[userId], references: [id])
 }
 
 
